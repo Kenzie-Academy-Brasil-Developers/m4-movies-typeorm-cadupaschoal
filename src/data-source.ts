@@ -16,7 +16,7 @@ const dataSourceConfig = (): DataSourceOptions => {
     return {
         type: "postgres",
         url: databaseUrl,
-        logging: true,
+        logging:false,
         entities: [entitiesPath],
         migrations:[migrationsPath]
     };
