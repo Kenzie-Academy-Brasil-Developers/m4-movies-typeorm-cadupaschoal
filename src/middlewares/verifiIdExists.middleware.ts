@@ -4,22 +4,26 @@ import { MovieRepo } from "../interfaces";
 import { AppDataSource } from "../data-source";
 import { Request, Response, NextFunction } from "express";
 
-const verifyNameExists = async (
+const verifyIdExists = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  const movieId: number = Number(req.params.id);
   const repo: MovieRepo = AppDataSource.getRepository(Movie);
-  const name: string = req.body.name;
+  const movie: Movie | null = await repo.findOne({
+    where: { id: movieId },
+  });
 
-  if (!name) return next();
-
-  const movieExists: boolean = await repo.exist({ where: { name } });
-
-  if (movieExists) {
-    throw new AppError("Movie already exists.", 409);
+  if (!movie) {
+    throw new AppError("Movie not found", 404);
   }
+
+  res.locals = {
+    ...res.locals,
+    movie,
+  };
   return next();
 };
 
-export default verifyNameExists;
+export default verifyIdExists;
